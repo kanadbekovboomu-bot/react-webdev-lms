@@ -15,10 +15,15 @@ describe('WebDev LMS Exercise Validator Engine', () => {
     it('normalizes hex to rgb', () => {
       expect(normalizeColor('#38bdf8')).toBe('rgb(56, 189, 248)');
       expect(normalizeColor('#ffffff')).toBe('rgb(255, 255, 255)');
+      expect(normalizeColor('#fff')).toBe('rgb(255, 255, 255)');
+      expect(normalizeColor('#000')).toBe('rgb(0, 0, 0)');
+      expect(normalizeColor('rgb( 56, 189, 248 )')).toBe('rgb(56, 189, 248)');
     });
 
     it('matches color styles across hex and rgb formats', () => {
       expect(styleMatches('rgb(56, 189, 248)', '#38bdf8')).toBe(true);
+      expect(styleMatches('rgb( 56, 189, 248 )', '#38bdf8')).toBe(true);
+      expect(styleMatches('rgb(255, 255, 255)', '#fff')).toBe(true);
       expect(styleMatches('#38bdf8', 'rgb(56, 189, 248)')).toBe(true);
       expect(styleMatches('border-box', 'border-box')).toBe(true);
     });

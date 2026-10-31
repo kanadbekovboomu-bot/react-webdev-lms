@@ -9,6 +9,13 @@
 export function normalizeColor(val) {
   if (!val) return '';
   const trimmed = String(val).trim().toLowerCase();
+  // If hex 3 chars e.g. #fff -> rgb(255, 255, 255)
+  if (/^#([0-9a-f]{3})$/i.test(trimmed)) {
+    const r = parseInt(trimmed[1] + trimmed[1], 16);
+    const g = parseInt(trimmed[2] + trimmed[2], 16);
+    const b = parseInt(trimmed[3] + trimmed[3], 16);
+    return `rgb(${r}, ${g}, ${b})`;
+  }
   // If hex 6 chars e.g. #38bdf8 -> rgb(56, 189, 248)
   if (/^#([0-9a-f]{6})$/i.test(trimmed)) {
     const r = parseInt(trimmed.slice(1, 3), 16);
@@ -16,7 +23,11 @@ export function normalizeColor(val) {
     const b = parseInt(trimmed.slice(5, 7), 16);
     return `rgb(${r}, ${g}, ${b})`;
   }
-  return trimmed.replace(/\s*,\s*/g, ', ');
+  return trimmed
+    .replace(/\s*,\s*/g, ', ')
+    .replace(/rgb\(\s*/g, 'rgb(')
+    .replace(/rgba\(\s*/g, 'rgba(')
+    .replace(/\s*\)/g, ')');
 }
 
 /**
@@ -234,8 +245,10 @@ export function calculateTrackProgress(lessons, completedLessonIds = [], trackId
  */
 export function calculateOverallProgress(lessons, completedLessonIds = []) {
   if (!lessons || lessons.length === 0) return 0;
-  const uniqueCompleted = completedLessonIds.filter((id) => lessons.some((l) => l.id === id));
-  return Math.round((uniqueCompleted.length / lessons.length) * 100);
+  const uniqueCompleted = [...new Set(completedLessonIds)].filter((id) =>
+    lessons.some((l) => l.id === id)
+  );
+  return Math.min(100, Math.round((uniqueCompleted.length / lessons.length) * 100));
 }
 
 /**
